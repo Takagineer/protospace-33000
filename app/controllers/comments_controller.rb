@@ -1,10 +1,12 @@
 class CommentsController < ApplicationController
   def create
-    if comment.save
-      comment = Comment.create(comment_params)
-      redirect_to "/prototyps/#{comment.prototype.id}"
+    @comment = Comment.new(comment_params)
+    if @comment.save
+      redirect_to prototype_path(@comment.prototype)
     else
-      render :prototype_path
+      @prototype = @comment.prototype
+      @comments = @prototype.comments
+      render "prototypes/show"
     end
   end
 
@@ -12,10 +14,10 @@ class CommentsController < ApplicationController
     @comments = Tweet.new.comments.includes(:user)
   end
 
-private
+  private
 
-def comment_params
-  params.require(:comment).permit(:text).merge(user_id: current_user.id, tweet_id: params[:tweet_id])
-end
+  def comment_params
+    params.require(:comment).permit(:text).merge(user_id: current_user.id, tweet_id: params[:tweet_id])
+  end
  
 end
